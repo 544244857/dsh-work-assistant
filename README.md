@@ -16,11 +16,27 @@ DSH 的工作助理插件：自带一条微信机器人通道，把你转发过�
 
 ## 装
 
+已经发到 npm，从网上装（推荐，装的是预构建产物，不需要本地编译）：
+
+```bash
+dsh plugin --profile <你的 profile> add dsh-work-assistant
+```
+
+从源码改着玩就装本地目录：
+
 ```bash
 dsh plugin --profile <你的 profile> add -w link:<这个目录的绝对路径>
 ```
 
+也可以直接从 GitHub Release 的 tarball 装：
+
+```bash
+dsh plugin --profile <你的 profile> add https://github.com/544244857/dsh-work-assistant/releases/download/v0.5.1/dsh-work-assistant-0.5.1.tgz
+```
+
 装完重启宿主。插件会自己创建数据目录，默认在 `~/.dsh/dsh-work-assistant/`。
+
+仓库在 [544244857/dsh-work-assistant](https://github.com/544244857/dsh-work-assistant)，npm 包名 `dsh-work-assistant`。
 
 ## 登录和设置
 
