@@ -1,0 +1,65 @@
+{
+  "name": "dsh-work-assistant",
+  "version": "0.5.1",
+  "private": false,
+  "type": "module",
+  "description": "DSH 工作助理：自带微信机器人通道、工作账本、工作知识库与定时提醒",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/544244857/dsh-work-assistant.git"
+  },
+  "homepage": "https://github.com/544244857/dsh-work-assistant#readme",
+  "bugs": {
+    "url": "https://github.com/544244857/dsh-work-assistant/issues"
+  },
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./lib/client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "icon": "./icon.svg",
+  "files": [
+    "index.js",
+    "lib/",
+    "locale/",
+    "icon.svg",
+    "cordis.patch.yml",
+    "README.md",
+    "INTRO.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "work-assistant",
+    "wechat",
+    "ilink"
+  ],
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  },
+  "dsh": {
+    "engines": {
+      "dsh": ">=0.2.1-rc.2"
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-primitives",
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.5"
+  }
+}

@@ -1,0 +1,31 @@
+- insert:
+    - id: dsh-work-assistant
+      name: dsh-work-assistant
+      config:
+        stateDir: ''
+        # 空 = 跟宿主的默认预设走。别人装这个插件时，他配的默认预设才是对的。
+        agentPreset: ''
+        permissionPreset: workspace-write
+        agentProvider: ''
+        agentModel: ''
+        agentReasoningEffort: ''
+        dailyBriefTimes:
+          - '09:00'
+          - '18:30'
+        tickIntervalSeconds: 60
+        mergeWindowMs: 1500
+        maxMessageChars: 1200
+        timeZone: ''
+        quietHoursStart: '22:00'
+        quietHoursEnd: '08:00'
+        weeklyReviewWeekday: 5
+        weeklyReviewTime: '18:00'
+        maxAssignments: 3
+        assignmentCwd: ''
+        assignmentModel: ''
+        assignmentPreset: ''
+        analysisEnabled: true
+        analysisDailyTime: '03:00'
+        analysisIdleMinutes: 30
+        analysisProvider: ''
+        analysisModel: ''
