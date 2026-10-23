@@ -1,6 +1,6 @@
 {
   "name": "dsh-work-assistant",
-  "version": "0.5.1",
+  "version": "0.5.3",
   "private": false,
   "type": "module",
   "description": "DSH 工作助理：自带微信机器人通道、工作账本、工作知识库与定时提醒",
