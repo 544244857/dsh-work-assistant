@@ -85,6 +85,21 @@ function tempDir() {
 // boot 是异步的（ctx.effect 里 void 一个 async IIFE），等一小会
 const settle = () => new Promise((resolve) => setTimeout(resolve, 150));
 
+// Windows 上 SQLite 的文件句柄关得比 await 慢一截：宿主租约的心跳和 dispose
+// 都是异步的，测试收尾立刻删目录会 EPERM。这里退让着删，别让清理把用例带红。
+async function removeDir(dir) {
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    try {
+      rmSync(dir, { recursive: true, force: true });
+      return;
+    } catch (err) {
+      if (err?.code !== 'EPERM' && err?.code !== 'EBUSY') throw err;
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+  }
+  rmSync(dir, { recursive: true, force: true });
+}
+
 test('宿主还没就绪 webServer 时，boot 不会因为裸读服务而崩掉', async () => {
   const dir = tempDir();
   const { ctx, cleanup, route } = makeCtx();
@@ -100,7 +115,7 @@ test('宿主还没就绪 webServer 时，boot 不会因为裸读服务而崩掉'
   assert.equal(route().kind, 'prefix');
 
   cleanup();
-  rmSync(dir, { recursive: true, force: true });
+  await removeDir(dir);
 });
 
 test('注册上的 handler 能直接回登录页', async () => {
@@ -132,7 +147,7 @@ test('注册上的 handler 能直接回登录页', async () => {
   assert.match(res.body, /微信登录/);
 
   cleanup();
-  rmSync(dir, { recursive: true, force: true });
+  await removeDir(dir);
 });
 
 test('宿主没有 ctx.inject 时只记一条日志，不抛错', async () => {
@@ -148,7 +163,7 @@ test('宿主没有 ctx.inject 时只记一条日志，不抛错', async () => {
   assert.equal(route(), null);
 
   cleanup();
-  rmSync(dir, { recursive: true, force: true });
+  await removeDir(dir);
 });
 
 test('设置页改过的值在重启后仍然生效', async () => {
@@ -187,7 +202,7 @@ test('设置页改过的值在重启后仍然生效', async () => {
   assert.deepEqual(data.settings.dailyBriefTimes, ['07:15'], 'state 里的设置要盖过 patch 默认值');
 
   cleanup();
-  rmSync(dir, { recursive: true, force: true });
+  await removeDir(dir);
 });
 
 test('pushBlocker 说清楚为什么发不出去', async () => {
