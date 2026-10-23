@@ -28,6 +28,7 @@ import { createAnalyzer, recordMessage } from './lib/analyzer.js';
 import { queryPerson, queryPeople } from './lib/graph.js';
 import { countMessages, listConversations, readConversation } from './lib/conversations.js';
 import { backfillMessages } from './lib/backfill.js';
+import { createHostLease } from './lib/host-lease.js';
 import { resolveZone } from './lib/time.js';
 
 export const name = 'dsh-work-assistant';
@@ -175,6 +176,8 @@ export function apply(ctx, rawConfig) {
   let quietReports = [];
   let reportFlusher = null;
   let analyzer = null;
+  // 同一个数据目录可能被桌面端和 dsh web 同时打开，租约决定谁真的去轮询、去发提醒
+  let lease = null;
   let pollAbort = null;
   let pollStarted = false;
   let loginWatcher = null;
@@ -190,6 +193,10 @@ export function apply(ctx, rawConfig) {
     lastError: state.lastError,
     loginStatus: state.login?.status ?? 'idle',
     canPush: pushBlocker(state) === null,
+    // primary 表示本实例在真正干活；standby 是「另一个宿主在跑，我等着」。
+    // 面板要靠它说清楚「为什么这条提醒是别人发的 / 为什么这边不动」。
+    role: lease ? (lease.isPrimary() ? 'primary' : 'standby') : 'primary',
+    hosts: lease ? lease.hosts().map((row) => ({ pid: row.pid, role: row.role, startedAt: row.startedAt })) : [],
     stateDir: dir,
     loginUrl: `${BASE_PATH}/login`,
   });
@@ -316,6 +323,12 @@ export function apply(ctx, rawConfig) {
 
   function startPolling() {
     if (pollStarted) return;
+    // 待命实例（另一个宿主在跑）绝不轮询：两边都拉同一个机器人，
+    // 消息会被谁先拿到谁先处理，提醒也会推两遍。
+    if (lease && !lease.isPrimary()) {
+      log('poll: 本实例在待命，不轮询');
+      return;
+    }
     pollStarted = true;
     state.status = 'running';
     // 微信的登录态会失效（errcode -14）。失效后长轮询会一直报错，
@@ -1143,6 +1156,12 @@ export function apply(ctx, rawConfig) {
   }
 
   function startTicker() {
+    // 待命的实例不跑定时器：提醒是「一人份」的事，两个宿主都跑就会推两遍，
+    // 而且另一边的账本可能还停在过去，内容还会不一样。
+    if (lease && !lease.isPrimary()) {
+      log('ticker: 本实例在待命，不跑定时提醒');
+      return;
+    }
     if (ticker) ticker.stop();
     ticker = createTicker({
       store,
@@ -1153,7 +1172,8 @@ export function apply(ctx, rawConfig) {
       maxChars: config.maxMessageChars,
       getState: () => state,
       saveState: () => saveState().catch((err) => log(`ticker: 存简报进度失败 ${err?.message ?? err}`)),
-      push: (text) => push(text),
+      // 第二道保险：心跳万一刚好过期又被别人接手，这里也能拦住重复推送
+      push: (text) => (lease && !lease.isPrimary() ? Promise.resolve(false) : push(text)),
       log,
       intervalMs: config.tickIntervalSeconds * 1000,
     });
@@ -1388,6 +1408,8 @@ export function apply(ctx, rawConfig) {
       // 会说成「副手交了报告」，听着莫名其妙。安静时段就只记日志，不打扰。
       notify: async (text) => {
         if (!text) return false;
+        // 待命实例不推：同一个人的提醒只该有一份
+        if (lease && !lease.isPrimary()) return false;
         if (inQuietHours(new Date(), zone, quietHoursOf(config))) {
           log('analysis: 安静时段，结果只写日志不推送');
           return false;
@@ -1395,6 +1417,35 @@ export function apply(ctx, rawConfig) {
         return push(text);
       },
     });
+
+    // 先定「谁是主」，再决定要不要轮询、要不要跑定时器。
+    // 桌面端和 dsh web 共用同一个数据目录时，只有一个能真的收发消息；
+    // 另一个待命，等这边退出后自动接手（不用人工干预）。
+    lease = createHostLease(paths, {
+      log,
+      role: 'host',
+      onPromote: async () => {
+        if (state.botToken) {
+          startPolling();
+        } else {
+          state.status = 'idle';
+          await saveState().catch(() => {});
+        }
+        startTicker();
+      },
+      onDemote: () => {
+        stopPolling();
+        if (ticker) {
+          ticker.stop();
+          ticker = null;
+        }
+        // 状态也要跟着退回去：主控被抢走以后，这张卡片不该还写着 running，
+        // 否则用户看到「在跑」却收不到任何提醒。
+        state.status = 'standby';
+        void saveState().catch((err) => log(`lease: 记待命状态失败 ${err?.message ?? err}`));
+      },
+    });
+    const leaseState = await lease.start();
 
     startTicker();
 
@@ -1446,7 +1497,12 @@ export function apply(ctx, rawConfig) {
 
     // 只要拿到 token 就开始轮询。早期版本这里要求 owner 也拿到，
     // 结果微信不返回 ilink_user_id 时重启后就再也不收消息，owner 永远补不上，插件彻底哑掉。
-    if (state.botToken) {
+    if (!leaseState.primary) {
+      const holder = leaseState.hosts.find((row) => row.id !== lease.id);
+      log(`boot: 另一个宿主正在跑（pid ${holder?.pid ?? '?'}），本实例待命，等它退出后自动接手`);
+      state.status = 'standby';
+      await saveState();
+    } else if (state.botToken) {
       log('boot: 已有登录凭据，直接开始轮询');
       startPolling();
     } else {
@@ -1473,6 +1529,11 @@ export function apply(ctx, rawConfig) {
         loginWatcher = null;
       }
       if (ticker) ticker.stop();
+      // 交还主控权：另一个待命的宿主下次心跳就能立刻接手，不用等 90 秒过期
+      if (lease) {
+        void lease.stop();
+        lease = null;
+      }
       if (reportFlusher) {
         clearInterval(reportFlusher);
         reportFlusher = null;
@@ -1529,6 +1590,8 @@ export function apply(ctx, rawConfig) {
         /* 忽略 */
       }
       try {
+        // 待命实例不跑分析：两边都分析会白烧 token，还可能把同一批消息记两遍
+        if (lease && !lease.isPrimary()) return;
         // 分析可能要跑几十秒，不能 await 卡住这个 60 秒的清扫节拍
         void analyzer?.tick().catch((err) => log(`analysis: 定时分析出错 ${err?.message ?? err}`));
       } catch (err) {
