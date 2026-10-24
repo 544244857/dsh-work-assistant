@@ -1,16 +1,35 @@
 # dsh-work-assistant
 
-<img src="https://raw.githubusercontent.com/544244857/dsh-work-assistant/main/assets/banner.png" alt="dsh-work-assistant" width="1200">
+<p align="center">
+  <img src="https://raw.githubusercontent.com/544244857/dsh-work-assistant/main/assets/banner.png" alt="dsh-work-assistant" width="100%">
+</p>
 
-**微信里的工作助理。** 你把事说给它，它记成账本、排好先后、到点提醒你；干不完的活儿派给独立副手，回头还从笔记里认出人和关系。
+<p align="center">
+  <b>微信里的工作助理。</b>你把事说给它，它记成账本、排好先后、到点提醒你；<br>
+  干不完的活儿派给独立副手，回头还从笔记里认出人和关系。
+</p>
 
-[![npm version](https://img.shields.io/npm/v/dsh-work-assistant?color=2f6f5e)](https://www.npmjs.com/package/dsh-work-assistant)
-[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![node](https://img.shields.io/badge/node-%E2%89%A522.5-brightgreen)](package.json)
-[![DSH plugin](https://img.shields.io/badge/DSH-plugin-2f6f5e)](https://github.com/544244857/dsh-work-assistant)
-[![tests](https://img.shields.io/badge/tests-430%20passed-brightgreen)](test)
+<p align="center">
+  <a href="https://www.npmjs.com/package/dsh-work-assistant"><img src="https://img.shields.io/npm/v/dsh-work-assistant?color=2f6f5e" alt="npm"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="license"></a>
+  <a href="package.json"><img src="https://img.shields.io/badge/node-%E2%89%A522.5-brightgreen" alt="node"></a>
+  <a href="https://github.com/544244857/dsh-work-assistant"><img src="https://img.shields.io/badge/DSH-plugin-2f6f5e" alt="DSH plugin"></a>
+  <img src="https://img.shields.io/badge/tests-430%20passed-brightgreen" alt="tests">
+</p>
 
-不依赖任何第三方 IM 插件：微信通道、账本、知识库、人物图谱、定时提醒全在这一个包里。
+---
+
+**一句话**：微信官方机器人只能私聊，你在群里被 @ 了就转发给它，剩下的记账、排序、提醒、派活、认人交给它。
+
+不依赖任何第三方 IM 插件——微信通道、账本、知识库、人物图谱、定时提醒，全在这一个包里。
+
+| 你会说的话 | 它干的事 |
+| --- | --- |
+| 周五前把 Q3 报销整理好发我 | 记成工作项，自动判优先级，逾期会一直顶在最前 |
+| 现在有哪些活 | 按紧急度念一遍，不是只报个数 |
+| 这个你派个人去做 | 开一个独立会话去干，你继续跟助理说话，干完回来汇报 |
+| 值班表按 5 个人轮班排到年底 | 排完直接导出一份 xlsx 发到微信 |
+| 你认识哪些人 / 老周是谁 | 从聊天和笔记里认出的人，带关系判断和把握度 |
 
 ## 长什么样
 
@@ -18,15 +37,30 @@
 
 **一句"值班表先给我出一份"，它把人、规则记下来，排到 12-31，顺手导出一份 xlsx 发回微信。**
 
-<img src="https://raw.githubusercontent.com/544244857/dsh-work-assistant/main/assets/shot-ledger.png" width="820" alt="在微信里排值班表并导出 Excel">
+<p align="center">
+  <img src="https://raw.githubusercontent.com/544244857/dsh-work-assistant/main/assets/shot-ledger.png" width="88%" alt="在微信里排值班表并导出 Excel">
+</p>
 
 **PNG / XLSX / DOCX / MD 四种文件都能发到手机上，发完还能读回来核对内容。**
 
-<img src="https://raw.githubusercontent.com/544244857/dsh-work-assistant/main/assets/shot-files.png" width="820" alt="在微信里收发各种文件">
+<p align="center">
+  <img src="https://raw.githubusercontent.com/544244857/dsh-work-assistant/main/assets/shot-files.png" width="88%" alt="在微信里收发各种文件">
+</p>
 
 > 想看这个插件到底解决什么问题、内部数据怎么组织，读 [INTRO.md](INTRO.md)。这份 README 讲怎么装、怎么配、接口长什么样。
 
-**目录**：[先说边界](#先讲清楚一条边界) · [装](#装) · [登录和设置](#登录和设置) · [它能做什么](#它能做什么) · [工具](#给模型用的工具) · [配置](#配置) · [数据](#数据放在哪) · [接口](#http-接口) · [取舍](#设计上的几个取舍) · [限制](#已知限制)
+**目录**
+[先说边界](#先讲清楚一条边界) ·
+[装](#装) ·
+[登录和设置](#登录和设置) ·
+[它能做什么](#它能做什么) ·
+[工具](#给模型用的工具) ·
+[配置](#配置) ·
+[数据](#数据放在哪) ·
+[接口](#http-接口) ·
+[取舍](#设计上的几个取舍) ·
+[限制](#已知限制) ·
+[许可](#许可)
 
 ## 先讲清楚一条边界
 
@@ -35,6 +69,27 @@
 所以这个插件的做法是：你在群里被 @ 了，自己把那条消息**转发**给机器人。它记账、分析、提醒。
 
 这不是偷懒。个人微信没有对外开放的群消息接口，逆向客户端违反腾讯服务条款、有封号风险，所以这里不做。企业微信的智能机器人可以收群 @ 消息，那是另一条路，需要的话可以另做渠道。
+
+## 它是怎么跑的
+
+```
+微信（你的手机）                        DSH 宿主进程
+  │                                        │
+  │  你转发一句话 / 发个文件               │
+  ├───────────────►  iLink Bot 长轮询 ────►│ 通道
+  │                                        │   ↓
+  │                                        │ 助手会话（挂你选的预设与模型）
+  │                                        │   ↓ 调 work_* / kb_* / assign_* 工具
+  │                                        │ SQLite 单文件账本（work-assistant.db）
+  │  收到回执、提醒、文件                   │   ↓
+  │◄────────────── 发消息 / 发文件 ◄───────│ 60 秒 ticker + 每日摘要 + 周复盘
+```
+
+三个关键点：
+
+- **不需要公网地址**。走的是长轮询，不是 webhook，本机开着就能收。
+- **提醒是模板直发**，不经过模型，不烧 token，断网重连也不会重复轰炸。
+- **副手是独立会话**，跟你在 GUI 里开一个会话没区别，能看过程、能接着聊。
 
 ## 装
 
@@ -96,7 +151,7 @@ http://127.0.0.1:<你的 DSH 端口>/api/dsh-workassistant/login
 **记完一定会给回执**，形如：
 
 ```
-记下了 w-20261020-006：催广超开发票
+记下了 w-20261020-006：催老周补发票
 期限 10/24 18:00，优先级 高
 按紧急度排第 1 位（越靠前越该先做）
 现在手上共 6 件未完成
@@ -138,13 +193,13 @@ http://127.0.0.1:<你的 DSH 端口>/api/dsh-workassistant/login
 
 ### 让人去办
 
-「等广超给发票」这类不是自己动手的事，可以记成「等某人」并约好什么时候去问一句。到点提醒你"该问问广超了"，而不是提醒你去做那件你本来也做不了的事。
+「等老周补发票」这类不是自己动手的事，可以记成「等某人」并约好什么时候去问一句。到点提醒你"该问问老周了"，而不是提醒你去做那件你本来也做不了的事。
 
 具体行为：
 
 - 说了「下周问他」「周五再催」→ 按那个时间提醒。
 - 没说 → 默认记下来那天往后 3 天。回执里会给确切时刻，不用猜。
-- 到点推一条「该去问一句了：等广超给发票，等 广超」。催过就把下一次往后推 3 天，不会反复轰炸。
+- 到点推一条「该去问一句了：等老周补发票，等 老周」。催过就把下一次往后推 3 天，不会反复轰炸。
 - 第二次起措辞变成「还没回音：…」，提醒你这事还悬着。
 - 标成已完成或放弃后就不再催。
 - 推送失败不动时间，下一轮接着试，不会静默漏掉。
@@ -180,16 +235,16 @@ http://127.0.0.1:<你的 DSH 端口>/api/dsh-workassistant/login
 
 聊天、工作项、知识库里出现过的人名，会被定期整理成一张关系表：谁是你的同事、谁是下属、谁是客户、谁在替谁办事。
 
-举个例子：知识库里那篇"值班表排法"写着"值班共 5 人轮转——舒子淇、彭喻、肖航、余鹏、曹曼"，跑一次分析之后，这五个人就进了名单，并带上"同事"或"下属"这种关系判断，而不是当成五个陌生字符串。
+举个例子：知识库里那篇"值班表排法"写着"值班共 5 人轮转——老周、小李、大刘、陈工、孙姐"，跑一次分析之后，这五个人就进了名单，并带上"同事"或"下属"这种关系判断，而不是当成五个陌生字符串。
 
 整理是模型做的，节奏有两条：
 
 1. **每天一次**，默认凌晨 3 点（`analysisDailyTime`）。
 2. **闲时一次**：只要新消息攒着、而且最后一条已经过了 `analysisIdleMinutes` 分钟没人说话，就顺手跑一遍。
 
-整页视图里有"认识的人"卡片，点名字能看这个人的关系卡；微信里也可以直接问"你认识哪些人""舒子淇是谁"。
+整页视图里有"认识的人"卡片，点名字能看这个人的关系卡；微信里也可以直接问"你认识哪些人""老周是谁"。
 
-关系是模型根据上下文猜的，不确定的会标低把握度——它认错的时候你直接说"舒子淇不是我下属，是同事"，它会改。
+关系是模型根据上下文猜的，不确定的会标低把握度——它认错的时候你直接说"老周不是我下属，是同事"，它会改。
 
 ### 看现有任务
 
@@ -279,7 +334,9 @@ http://127.0.0.1:<你的 DSH 端口>/api/dsh-workassistant/login
 
 ## 给模型用的工具
 
-这些工具只注册在助手会话里，不污染你的其他对话。
+23 个工具，只注册在助手会话和副手会话里，不污染你的其他对话。你不用记它们——直接用平常话说就行，它们只是模型伸手够得着的那几样东西。
+
+**账本**（记、查、改、提醒）
 
 | 工具 | 干什么 |
 | --- | --- |
@@ -289,16 +346,31 @@ http://127.0.0.1:<你的 DSH 端口>/api/dsh-workassistant/login
 | `work_snooze` | 把一条的提醒往后推，比如"这事下周再说" |
 | `work_digest` | 生成当前的工作摘要 |
 | `work_review` | 生成这一周的复盘（做完的 / 还欠着的） |
-| `work_assign` | 记成"等某人办"，并约好什么时候去问一句 |
-| `work_attach` | 把图片/文件挂到某条工作项上 |
-| `work_send_file` | 把本机文件或知识库里的内容发到微信 |
+
+**知识库与人**（长期记忆）
+
+| 工具 | 干什么 |
+| --- | --- |
 | `kb_write` | 往知识库写一条 |
 | `kb_search` | 搜知识库 |
 | `kb_read` | 读知识库某一条 |
 | `kb_list` | 列出知识库条目 |
-| `work_notify` | 主动往微信推一条消息 |
 | `work_people` | 看整理出来的认识的人，按提及次数排 |
 | `work_person` | 看某个人的关系卡，以及这个人在哪些事里出现过 |
+
+**交付与跟进**（发出去、等回音）
+
+| 工具 | 干什么 |
+| --- | --- |
+| `work_send_file` | 把本机文件或知识库里的内容发到微信 |
+| `work_attach` | 把图片/文件挂到某条工作项上 |
+| `work_notify` | 主动往微信推一条消息 |
+| `work_assign` | 记成"等某人办"，并约好什么时候去问一句 |
+
+**委派**（把活儿派出去）
+
+| 工具 | 干什么 |
+| --- | --- |
 | `assign_create` | 派一个副手出去干一件大事 |
 | `assign_list` | 看现在有哪些副手、都在干什么 |
 | `assign_inspect` | 看某个副手最近几步的动静 |
@@ -388,7 +460,7 @@ http://127.0.0.1:<你的 DSH 端口>/api/dsh-workassistant/login
 | `/assignment` | GET | 整页视图用：一个副手的详情和最近几步，`?id=a-20261021-001` |
 | `/assignment` | POST | 整页视图用：`{"action":"create","purpose":"..."}` / `{"action":"send","id":"...","message":"..."}` / `{"action":"stop","id":"..."}` |
 | `/people` | GET | 整页视图用：认识的人名单，`?limit=` 限条数 |
-| `/person` | GET | 整页视图用：一个人的关系卡，`?name=舒子淇` |
+| `/person` | GET | 整页视图用：一个人的关系卡，`?name=老周` |
 | `/analysis` | GET | 整理任务的状态：上次跑的结果、还有多少条消息没整理 |
 | `/analysis` | POST | 立刻整理一次（不等定时） |
 
