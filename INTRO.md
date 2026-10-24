@@ -1,8 +1,14 @@
 # dsh-work-assistant
 
+<img src="https://raw.githubusercontent.com/544244857/dsh-work-assistant/main/assets/banner.png" alt="dsh-work-assistant" width="1200">
+
 面向 DSH 的微信工作助理插件。自带微信机器人通道，将转发的消息解析为结构化工作项，维护优先级与提醒，并可将独立任务委派给单独会话执行。
 
 通道、账本、知识库与提醒均在本包内实现，不依赖第三方 IM 插件。
+
+<img src="https://raw.githubusercontent.com/544244857/dsh-work-assistant/main/assets/shot-ledger.png" width="760" alt="在微信里排值班表并导出 Excel">
+
+<img src="https://raw.githubusercontent.com/544244857/dsh-work-assistant/main/assets/shot-files.png" width="760" alt="在微信里收发各种文件">
 
 ---
 
@@ -124,11 +130,19 @@
 
 ## 安装
 
+从 npm 安装（推荐，装的是预构建产物，不需要本地编译）：
+
+```bash
+dsh plugin --profile <你的 profile> add dsh-work-assistant
+```
+
+改源码就用本地目录：
+
 ```bash
 dsh plugin --profile <你的 profile> add -w link:<此目录的绝对路径>
 ```
 
-安装后重启宿主。插件会自动创建数据目录，默认位于 `~/.dsh/dsh-work-assistant/`。
+也可以直接装 GitHub Release 上的 tarball。安装后重启宿主，插件会自动创建数据目录，默认位于 `~/.dsh/dsh-work-assistant/`。
 
 在 DSH 的**设置**中新增「工作助理」页：扫码登录、查看状态、调整提醒时间、选择会话预设与模型均在此处。手机微信扫码后，将机器人添加为联系人；凭据仅保存在本机。
 
@@ -150,8 +164,8 @@ dsh plugin --profile <你的 profile> add -w link:<此目录的绝对路径>
 - **不读取群聊。** 微信官方机器人仅支持私聊，无 @ 事件，需手动转发。
 - **对话记录仅保存文本。** 图片、语音与文件在记录中仅保留一句说明，原文件不入库。
 - **同名人员会合并。** 存在两个同名联系人时，当前仅显示一份档案，待后续支持人工合并与拆分。
-- **多宿主会导致重复推送。** 同一数据库被两个进程读写不会丢失数据，但提醒可能各推送一次。
-- **会话设置变更需重启生效。** 预设、模型、推理强度等配置会在重启宿主后按新值建立会话。
+- **同一数据目录只由一个宿主驱动。** 两个宿主指向同一份数据库时不会互相覆盖，但要靠 `hosts` 表的心跳选出主实例：其余实例待命、不轮询不推送，主实例退出后 30 秒内自动接手。想让两边同时干活需为其中一个改 `stateDir`。
+- **会话设置在下一条消息生效。** 预设、模型、推理强度等改动保存后只在关闭本轮之后重开会话，不影响正在进行的一轮；插件代码本身的改动仍需重启宿主。
 
 ## 许可
 
