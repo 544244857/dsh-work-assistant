@@ -108,7 +108,7 @@ dsh plugin --profile <你的 profile> add -w link:<这个目录的绝对路径>
 也可以直接从 GitHub Release 的 tarball 装：
 
 ```bash
-dsh plugin --profile <你的 profile> add https://github.com/544244857/dsh-work-assistant/releases/download/v0.5.5/dsh-work-assistant-0.5.5.tgz
+dsh plugin --profile <你的 profile> add https://github.com/544244857/dsh-work-assistant/releases/download/v0.5.6/dsh-work-assistant-0.5.6.tgz
 ```
 
 装完重启宿主。插件会自己创建数据目录，默认在 `~/.dsh/dsh-work-assistant/`。
