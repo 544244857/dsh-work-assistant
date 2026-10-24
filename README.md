@@ -1,10 +1,32 @@
 # dsh-work-assistant
 
-DSH 的工作助理插件：自带一条微信机器人通道，把你转发过来的消息记成工作项，给建议、能代做的主动请缨，到点提醒还没做完的事。
+<img src="https://raw.githubusercontent.com/544244857/dsh-work-assistant/main/assets/banner.png" alt="dsh-work-assistant" width="1200">
 
-不依赖任何第三方 IM 插件，通道、账本、知识库、提醒都在这个包里。
+**微信里的工作助理。** 你把事说给它，它记成账本、排好先后、到点提醒你；干不完的活儿派给独立副手，回头还从笔记里认出人和关系。
 
-> 想看这个插件到底解决什么问题、长什么样，先读 [INTRO.md](INTRO.md)。这份 README 讲的是怎么装、怎么配、接口长什么样。
+[![npm version](https://img.shields.io/npm/v/dsh-work-assistant?color=2f6f5e)](https://www.npmjs.com/package/dsh-work-assistant)
+[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![node](https://img.shields.io/badge/node-%E2%89%A522.5-brightgreen)](package.json)
+[![DSH plugin](https://img.shields.io/badge/DSH-plugin-2f6f5e)](https://github.com/544244857/dsh-work-assistant)
+[![tests](https://img.shields.io/badge/tests-430%20passed-brightgreen)](test)
+
+不依赖任何第三方 IM 插件：微信通道、账本、知识库、人物图谱、定时提醒全在这一个包里。
+
+## 长什么样
+
+在微信里说一句话，它记账、排期、出文件；手上一堆活儿的时候，回头在仪表盘上看全局。
+
+**一句"值班表先给我出一份"，它把人、规则记下来，排到 12-31，顺手导出一份 xlsx 发回微信。**
+
+<img src="https://raw.githubusercontent.com/544244857/dsh-work-assistant/main/assets/shot-ledger.png" width="820" alt="在微信里排值班表并导出 Excel">
+
+**PNG / XLSX / DOCX / MD 四种文件都能发到手机上，发完还能读回来核对内容。**
+
+<img src="https://raw.githubusercontent.com/544244857/dsh-work-assistant/main/assets/shot-files.png" width="820" alt="在微信里收发各种文件">
+
+> 想看这个插件到底解决什么问题、内部数据怎么组织，读 [INTRO.md](INTRO.md)。这份 README 讲怎么装、怎么配、接口长什么样。
+
+**目录**：[先说边界](#先讲清楚一条边界) · [装](#装) · [登录和设置](#登录和设置) · [它能做什么](#它能做什么) · [工具](#给模型用的工具) · [配置](#配置) · [数据](#数据放在哪) · [接口](#http-接口) · [取舍](#设计上的几个取舍) · [限制](#已知限制)
 
 ## 先讲清楚一条边界
 
@@ -31,7 +53,7 @@ dsh plugin --profile <你的 profile> add -w link:<这个目录的绝对路径>
 也可以直接从 GitHub Release 的 tarball 装：
 
 ```bash
-dsh plugin --profile <你的 profile> add https://github.com/544244857/dsh-work-assistant/releases/download/v0.5.3/dsh-work-assistant-0.5.3.tgz
+dsh plugin --profile <你的 profile> add https://github.com/544244857/dsh-work-assistant/releases/download/v0.5.5/dsh-work-assistant-0.5.5.tgz
 ```
 
 装完重启宿主。插件会自己创建数据目录，默认在 `~/.dsh/dsh-work-assistant/`。
