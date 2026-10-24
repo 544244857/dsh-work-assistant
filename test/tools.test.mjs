@@ -158,7 +158,9 @@ test('work_capture 落账本并返回未完成计数', async () => {
 
     assert.equal(out.data.openCount, 1);
     assert.match(out.summary, /记下了 w-\d{8}-001/);
-    assert.match(out.summary, /10\/24 18:00/);
+    // formatInstant 对当天的期限说「今天 18:00」，隔天才说「10/24 18:00」。
+    // 原来这里写死 10/24，一到 10 月 24 日跑测试就红——日期的断言别钉死相对表述。
+    assert.match(out.summary, /期限 (?:今天|\d{2}\/\d{2}) 18:00/);
 
     const ledger = await store.read((data) => data);
     assert.equal(ledger.items.length, 1);
