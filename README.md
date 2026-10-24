@@ -410,7 +410,7 @@ http://127.0.0.1:<你的 DSH 端口>/api/dsh-workassistant/login
 | `analysisProvider` | 空 | 分析用的模型提供方，留空跟助手一样（只能在 cordis.patch.yml 里改） |
 | `analysisModel` | 空 | 分析用的模型，留空跟助手一样 |
 
-`dailyBriefTimes`、`tickIntervalSeconds`、安静时段、每周复盘，以及会话的预设 / 权限 / 模型 / 推理强度，这几项在设置页里改更方便，改完会写进 `state.json`，重启也不会丢。其余几项得改 `cordis.patch.yml` 再重启宿主。
+`dailyBriefTimes`、`tickIntervalSeconds`、安静时段、每周复盘，以及会话的预设 / 权限 / 模型 / 推理强度，这几项在设置页里改更方便，改完写进库里的 `state` 表（键名 `settingsOverrides`），重启后会被读回来盖在 `cordis.patch.yml` 的默认值上，所以不会丢。其余几项得改 `cordis.patch.yml` 再重启宿主。
 
 会话设置保存后不重建会话：下一条微信消息进来时，会用新的预设、模型和权限档位重开一个助手会话。旧会话留在宿主的会话列表里，不会丢。
 
@@ -466,7 +466,7 @@ http://127.0.0.1:<你的 DSH 端口>/api/dsh-workassistant/login
 
 `/login/scan` 是只读的：页面每 2 秒问一次，它只把同一张码和状态返回去，不会换码。换码只在你点"重新获取"或者码过期时才发生。
 
-设置页改的值写进 `state.json` 的 `settingsOverrides`，重启后会被盖回配置，不会又被 `cordis.patch.yml` 里的默认值冲掉。
+设置页改的值写进库里的 `state` 表（键名 `settingsOverrides`），重启后会被盖回配置，不会又被 `cordis.patch.yml` 里的默认值冲掉。
 
 ## 设计上的几个取舍
 
